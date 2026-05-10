@@ -1,0 +1,17 @@
+{
+  "best_model": "RandomForest",
+  "best_accuracy": 1.0,
+  "accuracy_comparison": {
+    "RandomForest": 1.0,
+    "LogisticRegression": 1.0,
+    "DecisionTree": 1.0
+  },
+  "training_rows": 18,
+  "features": [
+    "traffic_density",
+    "weather",
+    "vehicle_count",
+    "speed",
+    "road_condition"
+  ]
+}

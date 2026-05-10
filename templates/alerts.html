@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title mb-3">Alerts</h2>
+<div class="panel table-responsive">
+    <table class="table table-hover align-middle">
+        <thead><tr><th>Location</th><th>Risk</th><th>Message</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <tbody>
+        {% for alert in alerts %}
+        <tr>
+            <td>{{ alert.location }}</td>
+            <td><span class="badge text-bg-danger">{{ alert.risk_level }}</span></td>
+            <td>{{ alert.message }}</td>
+            <td>{{ "Active" if alert.is_active else "Resolved" }}</td>
+            <td>{{ alert.created_at }}</td>
+            <td>
+                {% if alert.is_active %}
+                <form method="post" action="{{ url_for('alerts.resolve_alert', alert_id=alert.id) }}">
+                    <button class="btn btn-sm btn-outline-success">Resolve</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

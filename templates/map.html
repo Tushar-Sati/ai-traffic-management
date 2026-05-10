@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="page-title">Risk Map</h2>
+    <div class="map-toolbar">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Map risk filters">
+            <button class="btn btn-outline-secondary active" data-risk-filter="all">All</button>
+            <button class="btn btn-outline-danger" data-risk-filter="High Risk">High</button>
+            <button class="btn btn-outline-warning" data-risk-filter="Medium Risk">Medium</button>
+            <button class="btn btn-outline-success" data-risk-filter="Low Risk">Low</button>
+        </div>
+        <div class="map-legend"><span class="dot high"></span> High <span class="dot medium"></span> Medium <span class="dot low"></span> Low</div>
+    </div>
+</div>
+<div id="trafficMap"></div>
+{% endblock %}
+{% block scripts %}
+<script>loadTrafficMap();</script>
+{% endblock %}

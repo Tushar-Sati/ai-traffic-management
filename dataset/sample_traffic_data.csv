@@ -1,0 +1,19 @@
+date,time,location,lat,lng,weather,traffic_density,vehicle_count,speed,road_condition,accident
+2026-05-01,08:15,Central Junction,28.6139000,77.2090000,Clear,42,310,48,Good,Low Risk
+2026-05-01,09:10,Ring Road,28.6202000,77.2245000,Fog,81,760,24,Wet,High Risk
+2026-05-02,18:40,Metro Cross,28.6353000,77.2250000,Rain,68,590,32,Wet,Medium Risk
+2026-05-02,21:20,Airport Road,28.5562000,77.1000000,Clear,35,250,57,Good,Low Risk
+2026-05-03,08:55,Market Square,28.6505000,77.2303000,Rain,88,840,20,Damaged,High Risk
+2026-05-03,14:30,Tech Park,28.5921000,77.0460000,Cloudy,55,410,41,Good,Medium Risk
+2026-05-04,19:05,North Flyover,28.7041000,77.1025000,Fog,77,690,26,Wet,High Risk
+2026-05-04,11:15,South Avenue,28.5355000,77.3910000,Clear,31,210,61,Good,Low Risk
+2026-05-05,17:45,Bus Terminal,28.6692000,77.4538000,Cloudy,62,530,36,Moderate,Medium Risk
+2026-05-05,22:35,Industrial Belt,28.7000000,77.3000000,Rain,91,880,18,Damaged,High Risk
+2026-05-06,07:50,College Road,28.6100000,77.1800000,Clear,39,280,52,Good,Low Risk
+2026-05-06,13:10,Lake View Road,28.5900000,77.2400000,Cloudy,50,360,44,Moderate,Medium Risk
+2026-05-07,08:25,Old Bridge,28.6400000,77.1200000,Fog,85,800,22,Damaged,High Risk
+2026-05-07,16:05,Green Corridor,28.5700000,77.2600000,Clear,28,180,63,Good,Low Risk
+2026-05-08,19:30,Station Circle,28.6610000,77.2160000,Rain,74,660,29,Wet,High Risk
+2026-05-08,12:45,Civic Center,28.6300000,77.2500000,Clear,47,330,49,Good,Low Risk
+2026-05-09,10:20,Hospital Road,28.6000000,77.2900000,Cloudy,58,460,38,Moderate,Medium Risk
+2026-05-09,20:15,Harbor Link,28.5450000,77.3200000,Rain,83,790,23,Wet,High Risk

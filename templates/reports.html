@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title mb-3">Reports</h2>
+<div class="panel report-actions">
+    <a class="btn btn-primary" href="{{ url_for('reports.export_csv') }}"><i class="bi bi-filetype-csv"></i> Export CSV</a>
+    <a class="btn btn-danger" href="{{ url_for('reports.export_pdf') }}"><i class="bi bi-filetype-pdf"></i> Export PDF</a>
+</div>
+{% endblock %}

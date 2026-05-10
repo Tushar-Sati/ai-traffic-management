@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <span class="eyebrow">ML Inference</span>
+        <h2 class="page-title mb-0">Accident Risk Prediction</h2>
+    </div>
+    <div class="btn-group btn-group-sm" role="group" aria-label="Prediction presets">
+        <button class="btn btn-outline-danger" data-preset="high">Peak Risk</button>
+        <button class="btn btn-outline-warning" data-preset="medium">Moderate</button>
+        <button class="btn btn-outline-success" data-preset="low">Stable</button>
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="panel">
+            <form id="predictionForm">
+                <label class="form-label">Location</label>
+                <input class="form-control mb-3" name="location" placeholder="Optional location">
+                <label class="form-label">Traffic Density</label>
+                <input class="form-control mb-3" type="number" step="0.1" name="traffic_density" required>
+                <label class="form-label">Weather</label>
+                <select class="form-select mb-3" name="weather" required>
+                    <option>Clear</option><option>Cloudy</option><option>Rain</option><option>Fog</option>
+                </select>
+                <label class="form-label">Vehicle Count</label>
+                <input class="form-control mb-3" type="number" name="vehicle_count" required>
+                <label class="form-label">Average Speed</label>
+                <input class="form-control mb-3" type="number" step="0.1" name="speed" required>
+                <label class="form-label">Road Condition</label>
+                <select class="form-select mb-4" name="road_condition" required>
+                    <option>Good</option><option>Moderate</option><option>Wet</option><option>Damaged</option>
+                </select>
+                <button class="btn btn-primary w-100"><i class="bi bi-cpu"></i> Predict Risk</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div id="predictionResult" class="result-panel">
+            <span class="eyebrow">Prediction Result</span>
+            <h3>Awaiting Input</h3>
+            <p>Submit traffic conditions to calculate accident risk.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>bindPredictionForm();</script>
+{% endblock %}

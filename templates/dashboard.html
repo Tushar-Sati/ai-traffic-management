@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="ops-header">
+    <div>
+        <span class="eyebrow">Live Traffic Intelligence</span>
+        <h1>AI Traffic Management & Accident Prediction</h1>
+        <p>Monitor risk concentration, congestion patterns, and alert activity from a single operations console.</p>
+    </div>
+    <div class="status-stack">
+        <span class="status-pill {{ 'ready' if model_ready else 'warning' }}">
+            <i class="bi {{ 'bi-check-circle' if model_ready else 'bi-exclamation-triangle' }}"></i>
+            {{ model_metrics.best_model if model_metrics else ("Model Ready" if model_ready else "Train Model") }}
+        </span>
+        {% if model_metrics %}
+        <span class="status-pill"><i class="bi bi-bullseye"></i> {{ "%.1f"|format(model_metrics.best_accuracy * 100) }}% Accuracy</span>
+        {% endif %}
+        <span class="status-pill"><i class="bi bi-database-check"></i> {{ total_records }} Records</span>
+    </div>
+</section>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="metric metric-danger">
+            <span>High Risk Incidents</span>
+            <strong>{{ total_accidents }}</strong>
+            <small>{{ high_risk_rate }}% of all records</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="metric metric-blue">
+            <span>Avg Traffic Density</span>
+            <strong>{{ traffic_density }}</strong>
+            <small>Network congestion score</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="metric metric-green">
+            <span>Avg Speed</span>
+            <strong>{{ avg_speed }}</strong>
+            <small>km/h across records</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="metric metric-amber">
+            <span>Active Alerts</span>
+            <strong>{{ active_alerts }}</strong>
+            <small>{{ hotspots }} hotspot zones tracked</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-7">
+        <div class="panel chart-panel">
+            <div class="panel-heading">
+                <div>
+                    <h5>Incident Trend</h5>
+                    <p>Daily high-risk records detected from uploaded datasets.</p>
+                </div>
+                <i class="bi bi-activity"></i>
+            </div>
+            <canvas id="dailyChart" height="130"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="panel chart-panel">
+            <div class="panel-heading">
+                <div>
+                    <h5>Risk Distribution</h5>
+                    <p>Low, medium, and high risk classification mix.</p>
+                </div>
+                <i class="bi bi-pie-chart"></i>
+            </div>
+            <canvas id="riskMixChart" height="150"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-xl-4">
+        <div class="panel chart-panel">
+            <div class="panel-heading">
+                <div>
+                    <h5>Weather Impact</h5>
+                    <p>Records grouped by weather condition.</p>
+                </div>
+            </div>
+            <canvas id="weatherChart" height="170"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="panel chart-panel">
+            <div class="panel-heading">
+                <div>
+                    <h5>Road Condition</h5>
+                    <p>Surface condition distribution.</p>
+                </div>
+            </div>
+            <canvas id="roadChart" height="170"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="panel chart-panel">
+            <div class="panel-heading">
+                <div>
+                    <h5>Monthly Accidents</h5>
+                    <p>High-risk trend by month.</p>
+                </div>
+            </div>
+            <canvas id="monthlyChart" height="170"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-xl-7">
+        <div class="panel table-responsive">
+            <div class="panel-heading">
+                <div>
+                    <h5>Priority Hotspots</h5>
+                    <p>Locations with repeated elevated risk.</p>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('map.map_page') }}">Open Map</a>
+            </div>
+            <table class="table align-middle">
+                <thead><tr><th>Location</th><th>Incidents</th><th>Avg Density</th><th>Risk</th></tr></thead>
+                <tbody>
+                {% for item in hotspot_rows %}
+                <tr>
+                    <td class="fw-semibold">{{ item.location }}</td>
+                    <td>{{ item.incidents }}</td>
+                    <td>{{ "%.1f"|format(item.avg_density or 0) }}</td>
+                    <td><span class="risk-badge {{ item.risk_level|lower|replace(' ', '-') }}">{{ item.risk_level }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-muted">No hotspot records yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="panel">
+            <div class="panel-heading">
+                <div>
+                    <h5>Active Notifications</h5>
+                    <p>High-risk predictions become alerts automatically.</p>
+                </div>
+                <a class="btn btn-sm btn-outline-danger" href="{{ url_for('alerts.list_alerts') }}">Review</a>
+            </div>
+            {% for alert in alerts %}
+            <div class="alert-list-item">
+                <strong>{{ alert.location }}</strong>
+                <span>{{ alert.message }}</span>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No active alerts.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="panel table-responsive mt-3">
+    <div class="panel-heading">
+        <div>
+            <h5>Recent Traffic Records</h5>
+            <p>Latest rows received from CSV upload or manual entry.</p>
+        </div>
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('datasets.list_records') }}">Manage Dataset</a>
+    </div>
+    <table class="table table-hover align-middle">
+        <thead><tr><th>Date</th><th>Time</th><th>Location</th><th>Weather</th><th>Density</th><th>Vehicles</th><th>Speed</th><th>Risk</th></tr></thead>
+        <tbody>
+        {% for row in recent_records %}
+        <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.time }}</td>
+            <td class="fw-semibold">{{ row.location }}</td>
+            <td>{{ row.weather }}</td>
+            <td>{{ row.traffic_density }}</td>
+            <td>{{ row.vehicle_count }}</td>
+            <td>{{ row.speed }}</td>
+            <td><span class="risk-badge {{ row.accident|lower|replace(' ', '-') }}">{{ row.accident }}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>loadDashboardCharts();</script>
+{% endblock %}
