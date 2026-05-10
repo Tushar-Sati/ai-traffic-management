@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash
 
 from db import db_cursor
@@ -32,8 +32,9 @@ def login():
             with db_cursor() as cur:
                 cur.execute("SELECT * FROM admins WHERE username=%s", (username,))
                 admin = cur.fetchone()
-        except Exception as exc:
-            flash(f"Database connection failed. Check your .env MySQL settings. Details: {exc}", "danger")
+        except Exception:
+            current_app.logger.exception("Admin login failed because the database is unavailable.")
+            flash("Login is temporarily unavailable. Please try again later.", "danger")
             return render_template("login.html"), 500
         if admin and check_password_hash(admin["password_hash"], password):
             session.clear()

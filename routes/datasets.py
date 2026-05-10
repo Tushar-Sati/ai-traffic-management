@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
 from db import db_cursor
 from routes.auth import login_required
@@ -38,8 +38,9 @@ def create_record():
     try:
         insert_record(data)
         flash("Record added.", "success")
-    except Exception as exc:
-        flash(f"Could not add record: {exc}", "danger")
+    except Exception:
+        current_app.logger.exception("Could not add traffic record.")
+        flash("Could not add record. Please check the data and try again.", "danger")
     return redirect(url_for("datasets.list_records"))
 
 
@@ -68,8 +69,9 @@ def update_record(record_id):
                 WHERE id=%s
             """, tuple(data[c] for c in REQUIRED_COLUMNS) + (record_id,))
         flash("Record updated.", "success")
-    except Exception as exc:
-        flash(f"Could not update record: {exc}", "danger")
+    except Exception:
+        current_app.logger.exception("Could not update traffic record.")
+        flash("Could not update record. Please check the data and try again.", "danger")
     return redirect(url_for("datasets.list_records"))
 
 
@@ -102,8 +104,9 @@ def upload_csv():
             insert_record(data)
             count += 1
         flash(f"Imported {count} records.", "success")
-    except Exception as exc:
-        flash(f"Upload failed: {exc}", "danger")
+    except Exception:
+        current_app.logger.exception("Could not import traffic CSV.")
+        flash("Upload failed. Please check the CSV file and try again.", "danger")
     return redirect(url_for("datasets.list_records"))
 
 
