@@ -1,10 +1,11 @@
 import csv
 from io import BytesIO, StringIO
 
-from flask import Blueprint, Response, render_template, send_file
+from flask import Blueprint, Response, current_app, render_template, send_file
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+import demo_data
 from db import db_cursor
 from routes.auth import login_required
 
@@ -58,9 +59,15 @@ def export_pdf():
 
 
 def fetch_records(limit=None):
+    if current_app.config["DEMO_MODE"]:
+        return demo_data.traffic_records(limit=limit)
     sql = "SELECT date, time, location, weather, traffic_density, vehicle_count, speed, road_condition, accident FROM traffic_records ORDER BY date DESC, time DESC"
     if limit:
         sql += " LIMIT %s"
-    with db_cursor() as cur:
-        cur.execute(sql, (limit,) if limit else None)
-        return cur.fetchall()
+    try:
+        with db_cursor() as cur:
+            cur.execute(sql, (limit,) if limit else None)
+            return cur.fetchall()
+    except Exception:
+        current_app.logger.exception("Report database query failed. Using demo data.")
+        return demo_data.traffic_records(limit=limit)

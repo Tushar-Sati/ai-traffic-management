@@ -40,12 +40,15 @@ def predict():
     probability = round(float(probabilities.get(risk, 0)) * 100, 2)
     recommendation = recommendation_for(risk)
 
-    if risk == "High Risk":
-        with db_cursor(commit=True) as cur:
-            cur.execute("""
-                INSERT INTO alerts (location, risk_level, message)
-                VALUES (%s, %s, %s)
-            """, (payload.get("location", "Prediction Form"), risk, recommendation))
+    if risk == "High Risk" and not current_app.config["DEMO_MODE"]:
+        try:
+            with db_cursor(commit=True) as cur:
+                cur.execute("""
+                    INSERT INTO alerts (location, risk_level, message)
+                    VALUES (%s, %s, %s)
+                """, (payload.get("location", "Prediction Form"), risk, recommendation))
+        except Exception:
+            current_app.logger.exception("Could not store prediction alert.")
 
     return jsonify({"risk_level": risk, "probability": probability, "recommendation": recommendation})
 

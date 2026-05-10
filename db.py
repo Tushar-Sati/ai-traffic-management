@@ -11,6 +11,7 @@ def get_connection(database=True):
         "port": cfg["DB_PORT"],
         "user": cfg["DB_USER"],
         "password": cfg["DB_PASSWORD"],
+        "connection_timeout": cfg["DB_CONNECTION_TIMEOUT"],
     }
     if database:
         kwargs["database"] = cfg["DB_NAME"]

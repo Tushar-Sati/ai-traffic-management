@@ -36,6 +36,8 @@ def create_app():
 
 
 def seed_admin():
+    if Config.DEMO_MODE:
+        return
     try:
         with db_cursor(commit=True) as cur:
             cur.execute("SELECT id FROM admins WHERE username=%s", ("admin",))

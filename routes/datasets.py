@@ -1,6 +1,7 @@
 import pandas as pd
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
+import demo_data
 from db import db_cursor
 from routes.auth import login_required
 
@@ -24,9 +25,16 @@ def normalize_risk(value):
 @datasets_bp.route("")
 @login_required
 def list_records():
-    with db_cursor() as cur:
-        cur.execute("SELECT * FROM traffic_records ORDER BY date DESC, time DESC LIMIT 300")
-        records = cur.fetchall()
+    if current_app.config["DEMO_MODE"]:
+        records = demo_data.traffic_records(limit=300)
+    else:
+        try:
+            with db_cursor() as cur:
+                cur.execute("SELECT * FROM traffic_records ORDER BY date DESC, time DESC LIMIT 300")
+                records = cur.fetchall()
+        except Exception:
+            current_app.logger.exception("Dataset list database query failed. Using demo data.")
+            records = demo_data.traffic_records(limit=300)
     return render_template("datasets.html", records=records, record=None, columns=REQUIRED_COLUMNS)
 
 
@@ -47,11 +55,20 @@ def create_record():
 @datasets_bp.route("/edit/<int:record_id>")
 @login_required
 def edit_record(record_id):
-    with db_cursor() as cur:
-        cur.execute("SELECT * FROM traffic_records WHERE id=%s", (record_id,))
-        record = cur.fetchone()
-        cur.execute("SELECT * FROM traffic_records ORDER BY date DESC, time DESC LIMIT 300")
-        records = cur.fetchall()
+    if current_app.config["DEMO_MODE"]:
+        records = demo_data.traffic_records(limit=300)
+        record = next((row for row in records if row["id"] == record_id), None)
+    else:
+        try:
+            with db_cursor() as cur:
+                cur.execute("SELECT * FROM traffic_records WHERE id=%s", (record_id,))
+                record = cur.fetchone()
+                cur.execute("SELECT * FROM traffic_records ORDER BY date DESC, time DESC LIMIT 300")
+                records = cur.fetchall()
+        except Exception:
+            current_app.logger.exception("Dataset edit database query failed. Using demo data.")
+            records = demo_data.traffic_records(limit=300)
+            record = next((row for row in records if row["id"] == record_id), None)
     return render_template("datasets.html", records=records, record=record, columns=REQUIRED_COLUMNS)
 
 
@@ -78,9 +95,13 @@ def update_record(record_id):
 @datasets_bp.route("/delete/<int:record_id>", methods=["POST"])
 @login_required
 def delete_record(record_id):
-    with db_cursor(commit=True) as cur:
-        cur.execute("DELETE FROM traffic_records WHERE id=%s", (record_id,))
-    flash("Record deleted.", "success")
+    try:
+        with db_cursor(commit=True) as cur:
+            cur.execute("DELETE FROM traffic_records WHERE id=%s", (record_id,))
+        flash("Record deleted.", "success")
+    except Exception:
+        current_app.logger.exception("Could not delete traffic record.")
+        flash("Record changes require a connected database.", "warning")
     return redirect(url_for("datasets.list_records"))
 
 
