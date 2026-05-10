@@ -5,3 +5,5 @@ __pycache__/
 flask.*.log
 dataset/uploads/*
 !dataset/uploads/.gitkeep
+
+.vercel
